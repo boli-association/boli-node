@@ -1,0 +1,17 @@
+syntax = "proto3";
+package bolimoney.bolinode.proposals;
+
+import "gogoproto/gogo.proto";
+import "proposals/params.proto";
+import "proposals/poll.proto";
+// this line is used by starport scaffolding # genesis/proto/import
+
+option go_package = "github.com/bolimoney/boli-node/x/proposals/types";
+
+// GenesisState defines the proposals module's genesis state.
+message GenesisState {
+  Params params = 1 [(gogoproto.nullable) = false];
+  repeated Poll pollList = 2 [(gogoproto.nullable) = false];
+  uint64 pollCount = 3;
+  // this line is used by starport scaffolding # genesis/proto/state
+}
