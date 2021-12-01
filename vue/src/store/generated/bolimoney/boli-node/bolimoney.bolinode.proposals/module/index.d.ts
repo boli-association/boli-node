@@ -1,9 +1,12 @@
 import { StdFee } from "@cosmjs/launchpad";
 import { Registry, OfflineSigner, EncodeObject } from "@cosmjs/proto-signing";
 import { Api } from "./rest";
-import { MsgUpdatePoll } from "./types/proposals/tx";
-import { MsgCreatePoll } from "./types/proposals/tx";
+import { MsgCreateVote } from "./types/proposals/tx";
 import { MsgDeletePoll } from "./types/proposals/tx";
+import { MsgUpdatePoll } from "./types/proposals/tx";
+import { MsgDeleteVote } from "./types/proposals/tx";
+import { MsgUpdateVote } from "./types/proposals/tx";
+import { MsgCreatePoll } from "./types/proposals/tx";
 export declare const MissingWalletError: Error;
 export declare const registry: Registry;
 interface TxClientOptions {
@@ -15,9 +18,12 @@ interface SignAndBroadcastOptions {
 }
 declare const txClient: (wallet: OfflineSigner, { addr: addr }?: TxClientOptions) => Promise<{
     signAndBroadcast: (msgs: EncodeObject[], { fee, memo }?: SignAndBroadcastOptions) => any;
-    msgUpdatePoll: (data: MsgUpdatePoll) => EncodeObject;
-    msgCreatePoll: (data: MsgCreatePoll) => EncodeObject;
+    msgCreateVote: (data: MsgCreateVote) => EncodeObject;
     msgDeletePoll: (data: MsgDeletePoll) => EncodeObject;
+    msgUpdatePoll: (data: MsgUpdatePoll) => EncodeObject;
+    msgDeleteVote: (data: MsgDeleteVote) => EncodeObject;
+    msgUpdateVote: (data: MsgUpdateVote) => EncodeObject;
+    msgCreatePoll: (data: MsgCreatePoll) => EncodeObject;
 }>;
 interface QueryClientOptions {
     addr: string;

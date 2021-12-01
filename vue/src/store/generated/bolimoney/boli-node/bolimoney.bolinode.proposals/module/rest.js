@@ -179,5 +179,34 @@ export class Api extends HttpClient {
             format: "json",
             ...params,
         });
+        /**
+         * No description
+         *
+         * @tags Query
+         * @name QueryVoteAll
+         * @summary Queries a list of vote items.
+         * @request GET:/bolimoney/bolinode/proposals/vote
+         */
+        this.queryVoteAll = (query, params = {}) => this.request({
+            path: `/bolimoney/bolinode/proposals/vote`,
+            method: "GET",
+            query: query,
+            format: "json",
+            ...params,
+        });
+        /**
+         * No description
+         *
+         * @tags Query
+         * @name QueryVote
+         * @summary Queries a vote by id.
+         * @request GET:/bolimoney/bolinode/proposals/vote/{id}
+         */
+        this.queryVote = (id, params = {}) => this.request({
+            path: `/bolimoney/bolinode/proposals/vote/${id}`,
+            method: "GET",
+            format: "json",
+            ...params,
+        });
     }
 }

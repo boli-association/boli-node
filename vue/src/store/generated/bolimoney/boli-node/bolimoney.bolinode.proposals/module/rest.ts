@@ -14,9 +14,18 @@ export interface ProposalsMsgCreatePollResponse {
   id?: string;
 }
 
+export interface ProposalsMsgCreateVoteResponse {
+  /** @format uint64 */
+  id?: string;
+}
+
 export type ProposalsMsgDeletePollResponse = object;
 
+export type ProposalsMsgDeleteVoteResponse = object;
+
 export type ProposalsMsgUpdatePollResponse = object;
+
+export type ProposalsMsgUpdateVoteResponse = object;
 
 /**
  * Params defines the parameters for the module.
@@ -47,8 +56,27 @@ export interface ProposalsQueryAllPollResponse {
   pagination?: V1Beta1PageResponse;
 }
 
+export interface ProposalsQueryAllVoteResponse {
+  Vote?: ProposalsVote[];
+
+  /**
+   * PageResponse is to be embedded in gRPC response messages where the
+   * corresponding request message has used PageRequest.
+   *
+   *  message SomeResponse {
+   *          repeated Bar results = 1;
+   *          PageResponse page = 2;
+   *  }
+   */
+  pagination?: V1Beta1PageResponse;
+}
+
 export interface ProposalsQueryGetPollResponse {
   Poll?: ProposalsPoll;
+}
+
+export interface ProposalsQueryGetVoteResponse {
+  Vote?: ProposalsVote;
 }
 
 /**
@@ -57,6 +85,14 @@ export interface ProposalsQueryGetPollResponse {
 export interface ProposalsQueryParamsResponse {
   /** params holds all the parameters of this module. */
   params?: ProposalsParams;
+}
+
+export interface ProposalsVote {
+  /** @format uint64 */
+  id?: string;
+  pollID?: string;
+  option?: string;
+  creator?: string;
 }
 
 export interface ProtobufAny {
@@ -378,6 +414,48 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
   queryPoll = (id: string, params: RequestParams = {}) =>
     this.request<ProposalsQueryGetPollResponse, RpcStatus>({
       path: `/bolimoney/bolinode/proposals/poll/${id}`,
+      method: "GET",
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryVoteAll
+   * @summary Queries a list of vote items.
+   * @request GET:/bolimoney/bolinode/proposals/vote
+   */
+  queryVoteAll = (
+    query?: {
+      "pagination.key"?: string;
+      "pagination.offset"?: string;
+      "pagination.limit"?: string;
+      "pagination.countTotal"?: boolean;
+      "pagination.reverse"?: boolean;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<ProposalsQueryAllVoteResponse, RpcStatus>({
+      path: `/bolimoney/bolinode/proposals/vote`,
+      method: "GET",
+      query: query,
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryVote
+   * @summary Queries a vote by id.
+   * @request GET:/bolimoney/bolinode/proposals/vote/{id}
+   */
+  queryVote = (id: string, params: RequestParams = {}) =>
+    this.request<ProposalsQueryGetVoteResponse, RpcStatus>({
+      path: `/bolimoney/bolinode/proposals/vote/${id}`,
       method: "GET",
       format: "json",
       ...params,

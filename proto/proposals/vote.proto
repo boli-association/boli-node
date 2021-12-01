@@ -1,0 +1,11 @@
+syntax = "proto3";
+package bolimoney.bolinode.proposals;
+
+option go_package = "github.com/bolimoney/boli-node/x/proposals/types";
+
+message Vote {
+  uint64 id = 1;
+  string pollID = 2; 
+  string option = 3; 
+  string creator = 4;
+}

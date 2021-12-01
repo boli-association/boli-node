@@ -1,13 +1,16 @@
 import { Writer, Reader } from "protobufjs/minimal";
 import { Params } from "../proposals/params";
 import { Poll } from "../proposals/poll";
+import { Vote } from "../proposals/vote";
 export declare const protobufPackage = "bolimoney.bolinode.proposals";
 /** GenesisState defines the proposals module's genesis state. */
 export interface GenesisState {
     params: Params | undefined;
     pollList: Poll[];
-    /** this line is used by starport scaffolding # genesis/proto/state */
     pollCount: number;
+    voteList: Vote[];
+    /** this line is used by starport scaffolding # genesis/proto/state */
+    voteCount: number;
 }
 export declare const GenesisState: {
     encode(message: GenesisState, writer?: Writer): Writer;

@@ -353,6 +353,7 @@ func New(
 		keys[proposalsmoduletypes.StoreKey],
 		keys[proposalsmoduletypes.MemStoreKey],
 		app.GetSubspace(proposalsmoduletypes.ModuleName),
+		app.BankKeeper,
 	)
 	proposalsModule := proposalsmodule.NewAppModule(appCodec, app.ProposalsKeeper, app.AccountKeeper, app.BankKeeper)
 
