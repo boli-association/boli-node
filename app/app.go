@@ -89,6 +89,9 @@ import (
 	"github.com/tendermint/spm/openapiconsole"
 
 	"github.com/bolimoney/boli-node/docs"
+	nodemodule "github.com/bolimoney/boli-node/x/node"
+	nodemodulekeeper "github.com/bolimoney/boli-node/x/node/keeper"
+	nodemoduletypes "github.com/bolimoney/boli-node/x/node/types"
 	proposalsmodule "github.com/bolimoney/boli-node/x/proposals"
 	proposalsmodulekeeper "github.com/bolimoney/boli-node/x/proposals/keeper"
 	proposalsmoduletypes "github.com/bolimoney/boli-node/x/proposals/types"
@@ -143,6 +146,7 @@ var (
 		transfer.AppModuleBasic{},
 		vesting.AppModuleBasic{},
 		proposalsmodule.AppModuleBasic{},
+		nodemodule.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
 	)
 
@@ -212,7 +216,9 @@ type App struct {
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
 	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
 
-	ProposalsKeeper proposalsmodulekeeper.Keeper
+	ProposalsKeeper  proposalsmodulekeeper.Keeper
+	ScopedNodeKeeper capabilitykeeper.ScopedKeeper
+	NodeKeeper       nodemodulekeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// mm is the module manager
@@ -250,6 +256,7 @@ func New(
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey, feegrant.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
 		proposalsmoduletypes.StoreKey,
+		nodemoduletypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
@@ -357,11 +364,25 @@ func New(
 	)
 	proposalsModule := proposalsmodule.NewAppModule(appCodec, app.ProposalsKeeper, app.AccountKeeper, app.BankKeeper)
 
+	scopedNodeKeeper := app.CapabilityKeeper.ScopeToModule(nodemoduletypes.ModuleName)
+	app.ScopedNodeKeeper = scopedNodeKeeper
+	app.NodeKeeper = *nodemodulekeeper.NewKeeper(
+		appCodec,
+		keys[nodemoduletypes.StoreKey],
+		keys[nodemoduletypes.MemStoreKey],
+		app.GetSubspace(nodemoduletypes.ModuleName),
+		app.IBCKeeper.ChannelKeeper,
+		&app.IBCKeeper.PortKeeper,
+		scopedNodeKeeper,
+	)
+	nodeModule := nodemodule.NewAppModule(appCodec, app.NodeKeeper, app.AccountKeeper, app.BankKeeper)
+
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 
 	// Create static IBC router, add transfer route, then set and seal it
 	ibcRouter := ibcporttypes.NewRouter()
 	ibcRouter.AddRoute(ibctransfertypes.ModuleName, transferModule)
+	ibcRouter.AddRoute(nodemoduletypes.ModuleName, nodeModule)
 	// this line is used by starport scaffolding # ibc/app/router
 	app.IBCKeeper.SetRouter(ibcRouter)
 
@@ -396,6 +417,7 @@ func New(
 		params.NewAppModule(app.ParamsKeeper),
 		transferModule,
 		proposalsModule,
+		nodeModule,
 		// this line is used by starport scaffolding # stargate/app/appModule
 	)
 
@@ -431,6 +453,7 @@ func New(
 		evidencetypes.ModuleName,
 		ibctransfertypes.ModuleName,
 		proposalsmoduletypes.ModuleName,
+		nodemoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 	)
 
@@ -454,6 +477,7 @@ func New(
 		ibc.NewAppModule(app.IBCKeeper),
 		transferModule,
 		proposalsModule,
+		nodeModule,
 		// this line is used by starport scaffolding # stargate/app/appModule
 	)
 	app.sm.RegisterStoreDecoders()
@@ -642,6 +666,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
 	paramsKeeper.Subspace(ibchost.ModuleName)
 	paramsKeeper.Subspace(proposalsmoduletypes.ModuleName)
+	paramsKeeper.Subspace(nodemoduletypes.ModuleName)
 	// this line is used by starport scaffolding # stargate/app/paramSubspace
 
 	return paramsKeeper
