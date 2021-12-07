@@ -38,7 +38,6 @@ func (k msgServer) CreateVote(goCtx context.Context, msg *types.MsgCreateVote) (
 	}, nil
 }
 
-
 func (k msgServer) UpdateVote(goCtx context.Context, msg *types.MsgUpdateVote) (*types.MsgUpdateVoteResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
